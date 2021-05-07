@@ -1,180 +1,145 @@
 import 'package:flutter/material.dart';
 
+import 'widgets/app_drawer.dart';
+
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData.dark(
-            // color: Colors.black;
-            ),
-        home: MyHomePage());
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark(),
+      home: MainPage(),
+    );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MainPage extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MainPageState createState() => _MainPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final List<String> names = <String>[];
-
-  final List<int> msgCount = <int>[];
-
-  TextEditingController nameController = TextEditingController();
-
-  void addItemToList() {
-    setState(() {
-      names.insert(0, nameController.text);
-      msgCount.insert(0, 0);
-    });
-  }
-
-  // void cleanTextfield(){
-  // if(floatingActionButton)
-  // }
+class _MainPageState extends State<MainPage> {
+  var currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.lightBlue),
-        title: ListTile(
-          title: Center(
-            child: Icon(
-              Icons.cake,
-              color: Colors.lightBlue,
-            ),
-          ),
-          trailing: Icon(
-            Icons.stars_outlined,
+        title: Icon(
+          Icons.cake,
+          color: Colors.lightBlue,
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.stars_outlined),
             color: Colors.lightBlue,
+            onPressed: () {},
           ),
-        ),
+        ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: Text("xyz"),
-              accountEmail: Text("@xyz"),
-              currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.white, child: Text("xyz")),
-            ),
-            ListTile(
-              title: new Text("Perfil"),
-              leading: new Icon(Icons.account_box_rounded),
-            ),
-            ListTile(
-              title: new Text("Listas"),
-              leading: new Icon(Icons.list),
-            ),
-            ListTile(
-              title: new Text("Temas"),
-              leading: new Icon(Icons.bubble_chart),
-            ),
-            ListTile(
-              title: new Text("Elementos Guardados"),
-              leading: new Icon(Icons.save),
-            ),
-            ListTile(
-              title: new Text("Momentos"),
-              leading: new Icon(Icons.animation),
-            ),
-            Divider(
-              height: 0.1,
-            ),
-            ListTile(
-              title: Text("Confifuracion de privacidad"),
-            ),
-            ListTile(
-              title: Text("Centro de ayuda"),
-            ),
-            Divider(
-              height: 0.5,
-            ),
-            ListTile(
-              leading: Icon(Icons.highlight),
-              trailing: Icon(Icons.qr_code_rounded),
-            )
-          ],
-        ),
-      ),
+      drawer: AppDrawer(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          addItemToList();
-        },
+        onPressed: () {},
         child: Icon(Icons.add_comment, color: Colors.white),
         backgroundColor: Colors.black12,
       ),
-      body: Column(children: <Widget>[
-        Padding(
-          padding: EdgeInsets.all(20),
-          child: TextField(
-            controller: nameController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Add Text',
-            ),
-          ),
+      body: _Body(index: currentIndex),
+      bottomNavigationBar: _AppNavBar(
+        currentIndex: currentIndex,
+        onTap: (index) => setState(() => currentIndex = index),
+      ),
+    );
+  }
+}
+
+class _AppNavBar extends StatelessWidget {
+  const _AppNavBar({
+    Key? key,
+    required this.currentIndex,
+    required this.onTap,
+  }) : super(key: key);
+
+  final int currentIndex;
+  final Function(int) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      currentIndex: currentIndex,
+      fixedColor: Colors.white,
+      items: [
+        BottomNavigationBarItem(
+          label: 'Home',
+          icon: Icon(Icons.home, color: Colors.lightBlue),
         ),
+        BottomNavigationBarItem(
+          label: 'Search',
+          icon: Icon(Icons.search, color: Colors.lightBlue),
+        ),
+        BottomNavigationBarItem(
+          label: 'Notifications',
+          icon: Icon(Icons.notifications, color: Colors.lightBlue),
+        ),
+        BottomNavigationBarItem(
+          label: 'Messages',
+          icon: Icon(Icons.message, color: Colors.lightBlue),
+        ),
+      ],
+      onTap: onTap,
+    );
+  }
+}
+
+class _Body extends StatelessWidget {
+  const _Body({
+    Key? key,
+    required this.index,
+  }) : super(key: key);
+
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return IndexedStack(
+      index: index,
+      children: [
+        HomePage(),
+        Center(child: Text('SearchPage')),
+        Center(child: Text('NotificationsPage')),
+        Center(child: Text('MessagesPage')),
+      ],
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
         Expanded(
           child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: names.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  height: 50,
-                  margin: EdgeInsets.all(2),
-                  color: msgCount[index] >= 10
-                      ? Colors.black
-                      : msgCount[index] > 3
-                          ? Colors.black
-                          : Colors.black,
-                  child: Center(
-                    child: Text(
-                      '${names[index]}',
-                      // (${msgCount[index]})',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                );
-              }),
+            padding: const EdgeInsets.all(8),
+            itemCount: 5,
+            itemBuilder: (_, int index) {
+              debugPrint('building $this... ${DateTime.now()}');
+
+              return ListTile(
+                leading: CircleAvatar(),
+                title: Text('Jack'),
+                subtitle: Text('Facebook sucks!'),
+              );
+            },
+          ),
         ),
-      ]),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        fixedColor: Colors.white,
-        items: [
-          BottomNavigationBarItem(
-            label: "Home",
-            icon: Icon(Icons.home, color: Colors.lightBlue),
-          ),
-          BottomNavigationBarItem(
-            label: "Search",
-            icon: Icon(Icons.search, color: Colors.lightBlue),
-          ),
-          BottomNavigationBarItem(
-            label: "notifications",
-            icon: Icon(Icons.notifications, color: Colors.lightBlue),
-          ),
-          BottomNavigationBarItem(
-            label: "Messages",
-            icon: Icon(Icons.message, color: Colors.lightBlue),
-          ),
-        ],
-        onTap: (int index) {
-          setState(() {
-            // _currentIndex = index;
-          });
-        },
-      ),
+      ],
     );
   }
 }
